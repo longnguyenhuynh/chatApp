@@ -12,9 +12,17 @@ import java.io.*;
 import java.net.*;
 
 import java.util.ResourceBundle;
+import java.util.Vector;
+
+class ChatHandler {
+    public String userName;
+    public StringBuilder message;
+}
 
 public
 class ChatUIController implements Initializable {
+
+    static Vector<ChatHandler> ar = new Vector<>();
 
     final static int ServerPort = 1234;
 
@@ -38,10 +46,16 @@ class ChatUIController implements Initializable {
     @Override
     public
     void initialize(URL arg0, ResourceBundle arg1) {
-
         onlineList.setOnMouseClicked(event -> { // có thê bằng null
-            System.out.println(selectedUser);
-            selectedUser = onlineList.getSelectionModel().getSelectedItem();
+            if (onlineList.getSelectionModel().getSelectedItem() != null) {
+                selectedUser = onlineList.getSelectionModel().getSelectedItem();
+                chatBox.getItems().clear();
+                for (ChatHandler clt : ar) {
+                    if(clt.userName.equals(selectedUser)){
+                        chatBox.getItems().add(clt.message.toString());
+                    }
+                };
+            }
         });
 
         InetAddress ip = null;
@@ -75,25 +89,38 @@ class ChatUIController implements Initializable {
             while (true) {
                 try {
                     String msg = dis.readUTF();
-
                     // break the string into message and recipient part
                     String[] msgSplit     = msg.split("#", 2);
                     Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
                     switch (msgSplit[0]) {
                         case "NEW_USER":
+                            ChatHandler client = new ChatHandler();
+                            client.userName = msgSplit[1];
+                            ar.add(client);
                             onlineList.getItems().add(msgSplit[1]);
                             break;
                         case "ALL_USER":
                             String[] userString = msgSplit[1].split("#");
                             for (String user : userString) {
+                                ChatHandler clients = new ChatHandler();
+                                clients.userName = user;
+                                ar.add(clients);
                                 onlineList.getItems().add(user);
                             }
                             break;
                         case "REMOVE_USER":
+                            for (ChatHandler clt : ar) {
+                                if(clt.userName.equals(msgSplit[1]))
+                                    ar.remove(clt);
+                            };
                             onlineList.getItems().remove(msgSplit[1]);
                             break;
                         default:
-                            chatBox.getItems().add(msgSplit[0] + ": " + msgSplit[1]);
+                            for (ChatHandler clt : ar) {
+                                if(clt.userName.equals(msgSplit[0])) {
+                                    clt.message.append(msgSplit[0]).append(": ").append(msgSplit[1]).append("\n");
+                                }
+                            };
                             break;
                     }
                     });
@@ -124,7 +151,13 @@ class ChatUIController implements Initializable {
     private
     void sendMessage() {
         try {
+            for (ChatHandler clt : ar) {
+                if(clt.userName.equals(selectedUser)) {
+                    clt.message.append(clt.userName).append(": ").append(message.getText()).append("\n");
+                }
+            };
             String msg = selectedUser + "#" + message.getText();
+            message.clear();
             dos.writeUTF(msg);
         } catch (IOException e) {
             e.printStackTrace();

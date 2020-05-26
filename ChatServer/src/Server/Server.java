@@ -87,7 +87,12 @@ class ClientHandler implements Runnable {
                 }
             } catch (IOException e) {
                 try {
-                    Server.ar.remove(this);
+                    Iterator<ClientHandler> iterator = Server.ar.iterator();
+                    while (iterator.hasNext()) {
+                        ClientHandler clientHandler = iterator.next();
+                        if (clientHandler.equals(this))
+                            iterator.remove();
+                    }
                     this.s.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();

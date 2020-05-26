@@ -2,6 +2,7 @@ package Controller;
 
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
@@ -77,6 +78,7 @@ class ChatUIController implements Initializable {
 
                     // break the string into message and recipient part
                     String[] msgSplit     = msg.split("#", 2);
+                    Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
                     switch (msgSplit[0]) {
                         case "NEW_USER":
                             onlineList.getItems().add(msgSplit[1]);
@@ -87,10 +89,14 @@ class ChatUIController implements Initializable {
                                 onlineList.getItems().add(user);
                             }
                             break;
+                        case "REMOVE_USER":
+                            onlineList.getItems().remove(msgSplit[1]);
+                            break;
                         default:
                             chatBox.getItems().add(msgSplit[0] + ": " + msgSplit[1]);
                             break;
                     }
+                    });
                 } catch (IOException e) {
                     try {
                         finalS.close();

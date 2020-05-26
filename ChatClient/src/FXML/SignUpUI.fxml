@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="470.0" prefWidth="600.0" style="-fx-background-color: #121212;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.SignUpController">
+    <children>
+        <JFXTextField fx:id="username" focusColor="#03dac6" layoutX="175.0" layoutY="137.0" prefWidth="250.0" promptText="Username" style="-fx-text-fill: #ffffff;">
+            <font>
+                <Font size="16.0" />
+            </font></JFXTextField>
+        <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="250.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../assets/tick.png" />
+            </image>
+        </ImageView>
+        <JFXTextField fx:id="password" focusColor="#03dac6" layoutX="175.0" layoutY="200.0" prefWidth="250.0" promptText="Password" style="-fx-text-fill: #ffffff;">
+            <font>
+                <Font size="16.0" />
+            </font></JFXTextField>
+        <ImageView fitHeight="57.0" fitWidth="53.0" layoutX="110.0" layoutY="124.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../assets/user.png" />
+            </image>
+        </ImageView>
+        <ImageView fitHeight="57.0" fitWidth="53.0" layoutX="110.0" layoutY="187.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../assets/lock.png" />
+            </image>
+        </ImageView>
+        <ImageView fx:id="progress" fitHeight="100.0" fitWidth="100.0" layoutX="250.0" layoutY="411.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../assets/loading.gif" />
+            </image>
+        </ImageView>
+        <JFXButton fx:id="signup" alignment="CENTER" layoutX="250.0" layoutY="318.0" onAction="#signUpAction" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #03dac6;" text="Sign up">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </JFXButton>
+        <JFXButton alignment="CENTER" layoutX="486.0" layoutY="14.0" onAction="#loginButtonClicked" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #03dac6;" text="Login">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </JFXButton>
+        <ImageView fitHeight="57.0" fitWidth="53.0" layoutX="110.0" layoutY="250.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../assets/lock.png" />
+            </image>
+        </ImageView>
+        <JFXTextField fx:id="repassword" focusColor="#03dac6" layoutX="175.0" layoutY="261.0" onAction="#loginButtonClicked" prefWidth="250.0" promptText="Re-enter Password" style="-fx-text-fill: #ffffff;">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </JFXTextField>
+        <JFXTextField fx:id="alert" alignment="CENTER" editable="false" focusColor="WHITE" layoutX="222.0" layoutY="377.0" prefHeight="28.0" prefWidth="159.0" style="-fx-text-fill: #ffffff;" text="Password don't match" unFocusColor="WHITE">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </JFXTextField>
+    </children>
+</AnchorPane>

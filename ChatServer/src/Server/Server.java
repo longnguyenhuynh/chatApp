@@ -86,12 +86,14 @@ class ClientHandler implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                try {
-                    Iterator<ClientHandler> iterator = Server.ar.iterator();
+                try { //
+                    Iterator<ClientHandler> iterator = Server.ar.iterator(); // java.util.ConcurrentModificationException
                     while (iterator.hasNext()) {
                         ClientHandler clientHandler = iterator.next();
-                        if (clientHandler.equals(this))
+                        if (clientHandler.equals(this)) {
+                            RemoveClient(clientHandler.name);
                             iterator.remove();
+                        }
                     }
                     this.s.close();
                 } catch (IOException ioException) {
@@ -99,6 +101,12 @@ class ClientHandler implements Runnable {
                 }
             }
 
+        }
+    }
+
+    void RemoveClient(String name) throws IOException {
+        for (ClientHandler clt : Server.ar) { //notify current users new user
+            clt.dos.writeUTF("REMOVE_USER#" + name);
         }
     }
 

@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 
 class ChatHandler {
-    public String userName;
+    public String clientName;
     public StringBuilder message;
 }
 
@@ -47,12 +47,14 @@ class ChatUIController implements Initializable {
     public
     void initialize(URL arg0, ResourceBundle arg1) {
         onlineList.setOnMouseClicked(event -> { // có thê bằng null
-            if (onlineList.getSelectionModel().getSelectedItem() != null) {
-                selectedUser = onlineList.getSelectionModel().getSelectedItem();
+            String str = onlineList.getSelectionModel().getSelectedItem();
+            if (str != null && ! str.equals(selectedUser)) {
+                selectedUser = str;
                 chatBox.getItems().clear();
                 for (ChatHandler clt : ar) {
-                    if(clt.userName.equals(selectedUser)){
-                        chatBox.getItems().add(clt.message.toString());
+                    if(clt.clientName.equals(selectedUser)){
+                        System.out.println(clt.message.toString());
+                        chatBox.getItems().add("clt.message.toString()");
                     }
                 };
             }
@@ -94,30 +96,30 @@ class ChatUIController implements Initializable {
                     Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
                     switch (msgSplit[0]) {
                         case "NEW_USER":
-                            ChatHandler client = new ChatHandler();
-                            client.userName = msgSplit[1];
-                            ar.add(client);
+                            ChatHandler cli = new ChatHandler();
+                            cli.clientName = msgSplit[1];
+                            ar.add(cli);
                             onlineList.getItems().add(msgSplit[1]);
                             break;
                         case "ALL_USER":
                             String[] userString = msgSplit[1].split("#");
                             for (String user : userString) {
-                                ChatHandler clients = new ChatHandler();
-                                clients.userName = user;
-                                ar.add(clients);
+                                ChatHandler client = new ChatHandler();
+                                client.clientName = user;
+                                ar.add(client);
                                 onlineList.getItems().add(user);
                             }
                             break;
                         case "REMOVE_USER":
                             for (ChatHandler clt : ar) {
-                                if(clt.userName.equals(msgSplit[1]))
+                                if(clt.clientName.equals(msgSplit[1]))
                                     ar.remove(clt);
                             };
                             onlineList.getItems().remove(msgSplit[1]);
                             break;
                         default:
                             for (ChatHandler clt : ar) {
-                                if(clt.userName.equals(msgSplit[0])) {
+                                if(clt.clientName.equals(msgSplit[0])) {
                                     clt.message.append(msgSplit[0]).append(": ").append(msgSplit[1]).append("\n");
                                 }
                             };
@@ -151,14 +153,21 @@ class ChatUIController implements Initializable {
     private
     void sendMessage() {
         try {
-            for (ChatHandler clt : ar) {
-                if(clt.userName.equals(selectedUser)) {
-                    clt.message.append(clt.userName).append(": ").append(message.getText()).append("\n");
-                }
-            };
-            String msg = selectedUser + "#" + message.getText();
-            message.clear();
+            String msgText = message.getText();
+
+//            for (ChatHandler clt : ar) {
+//                if(clt.clientName.equals(selectedUser)) {
+//                    clt.message.append(userName).append(": ").append(msgText).append("\n");
+//                }
+//            }
+
+            String msg = selectedUser + "#" + msgText;
             dos.writeUTF(msg);
+
+            String yourMsg = userName + ": " + msgText;
+            chatBox.getItems().add(yourMsg);
+
+            message.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }

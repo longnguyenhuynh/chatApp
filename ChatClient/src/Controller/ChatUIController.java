@@ -46,17 +46,10 @@ class ChatUIController implements Initializable {
     @Override
     public
     void initialize(URL arg0, ResourceBundle arg1) {
-        onlineList.setOnMouseClicked(event -> { // có thê bằng null
+        onlineList.setOnMouseClicked(event -> {
             String str = onlineList.getSelectionModel().getSelectedItem();
             if (str != null && ! str.equals(selectedUser)) {
                 selectedUser = str;
-                chatBox.getItems().clear();
-                for (ChatHandler clt : ar) {
-                    if(clt.clientName.equals(selectedUser)){
-                        System.out.println(clt.message.toString());
-                        chatBox.getItems().add("clt.message.toString()");
-                    }
-                };
             }
         });
 
@@ -96,33 +89,19 @@ class ChatUIController implements Initializable {
                     Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
                     switch (msgSplit[0]) {
                         case "NEW_USER":
-                            ChatHandler cli = new ChatHandler();
-                            cli.clientName = msgSplit[1];
-                            ar.add(cli);
                             onlineList.getItems().add(msgSplit[1]);
                             break;
                         case "ALL_USER":
                             String[] userString = msgSplit[1].split("#");
                             for (String user : userString) {
-                                ChatHandler client = new ChatHandler();
-                                client.clientName = user;
-                                ar.add(client);
                                 onlineList.getItems().add(user);
                             }
                             break;
                         case "REMOVE_USER":
-                            for (ChatHandler clt : ar) {
-                                if(clt.clientName.equals(msgSplit[1]))
-                                    ar.remove(clt);
-                            };
                             onlineList.getItems().remove(msgSplit[1]);
                             break;
                         default:
-                            for (ChatHandler clt : ar) {
-                                if(clt.clientName.equals(msgSplit[0])) {
-                                    clt.message.append(msgSplit[0]).append(": ").append(msgSplit[1]).append("\n");
-                                }
-                            };
+                            chatBox.getItems().add(msgSplit[0] + ": " + msgSplit[1]);
                             break;
                     }
                     });
@@ -154,17 +133,10 @@ class ChatUIController implements Initializable {
     void sendMessage() {
         try {
             String msgText = message.getText();
-
-//            for (ChatHandler clt : ar) {
-//                if(clt.clientName.equals(selectedUser)) {
-//                    clt.message.append(userName).append(": ").append(msgText).append("\n");
-//                }
-//            }
-
             String msg = selectedUser + "#" + msgText;
             dos.writeUTF(msg);
 
-            String yourMsg = userName + ": " + msgText;
+            String yourMsg = userName.getText() + ": " + msgText;
             chatBox.getItems().add(yourMsg);
 
             message.clear();

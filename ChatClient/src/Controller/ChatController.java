@@ -12,17 +12,9 @@ import java.io.*;
 import java.net.*;
 
 import java.util.ResourceBundle;
-import java.util.Vector;
-
-class ChatHandler {
-    public String clientName;
-    public StringBuilder message;
-}
 
 public
-class ChatUIController implements Initializable {
-
-    static Vector<ChatHandler> ar = new Vector<>();
+class ChatController implements Initializable {
 
     final static int ServerPort = 1234;
 
@@ -54,6 +46,7 @@ class ChatUIController implements Initializable {
         });
 
         InetAddress ip = null;
+
         try {
             ip = InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
@@ -68,7 +61,6 @@ class ChatUIController implements Initializable {
         }
 
         try {
-            assert s != null;
             dis = new DataInputStream(s.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,6 +71,7 @@ class ChatUIController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         Socket finalS = s;
         Thread readMessage = new Thread(() -> {
             while (true) {

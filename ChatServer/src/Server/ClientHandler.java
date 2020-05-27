@@ -1,15 +1,14 @@
 package Server;
 
-import javax.management.MBeanTrustPermission;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Iterator;
 
 // ClientHandler class
 class ClientHandler implements Runnable {
     public String name;
+    public Boolean isOnline;
     final DataInputStream dis;
     final DataOutputStream dos;
     Socket s;
@@ -43,14 +42,7 @@ class ClientHandler implements Runnable {
                 }
             } catch (IOException e) {
                 try {
-                    for (Iterator<ClientHandler> iterator = Server.clientHandlerVector.iterator(); iterator.hasNext();) {
-                        ClientHandler clientHandler = iterator.next();
-                        if (clientHandler.equals(this)) {
-                            RemoveClient(clientHandler.name);
-                            iterator.remove();
-                            break;
-                        }
-                    }
+                    Server.clientHandlerVector.remove(this);
                     this.s.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();

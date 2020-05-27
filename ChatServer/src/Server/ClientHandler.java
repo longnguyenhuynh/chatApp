@@ -1,5 +1,6 @@
 package Server;
 
+import javax.management.MBeanTrustPermission;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -40,15 +41,14 @@ class ClientHandler implements Runnable {
                         break;
                     }
                 }
-
             } catch (IOException e) {
                 try {
-                    Iterator<ClientHandler> iterator = Server.clientHandlerVector.iterator();
-                    while (iterator.hasNext()) {
+                    for (Iterator<ClientHandler> iterator = Server.clientHandlerVector.iterator(); iterator.hasNext();) {
                         ClientHandler clientHandler = iterator.next();
                         if (clientHandler.equals(this)) {
                             RemoveClient(clientHandler.name);
                             iterator.remove();
+                            break;
                         }
                     }
                     this.s.close();
@@ -60,9 +60,7 @@ class ClientHandler implements Runnable {
         }
     }
     void RemoveClient(String name) throws IOException {
-        Iterator<ClientHandler> iterator = Server.clientHandlerVector.iterator(); // java.util.ConcurrentModificationException
-        while (iterator.hasNext()) {
-            ClientHandler clientHandler = iterator.next();
+        for (ClientHandler clientHandler : Server.clientHandlerVector) {
             clientHandler.dos.writeUTF("REMOVE_USER#" + name);
         }
     }
@@ -76,9 +74,7 @@ class ClientHandler implements Runnable {
     void AddAllOnlineClient() throws IOException {
         StringBuilder msg = new StringBuilder("ALL_USER#");
 
-        Iterator<ClientHandler> iterator = Server.clientHandlerVector.iterator(); // java.util.ConcurrentModificationException
-        while (iterator.hasNext()) {
-            ClientHandler clientHandler = iterator.next();
+        for (ClientHandler clientHandler : Server.clientHandlerVector) {
             msg.append(clientHandler.name).append("#");
         }
 

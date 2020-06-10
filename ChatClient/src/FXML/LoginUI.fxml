@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -18,10 +19,6 @@
                 <Image url="@../assets/tick.png" />
             </image>
         </ImageView>
-        <JFXTextField fx:id="password" focusColor="#03dac6" layoutX="175.0" layoutY="185.0" prefWidth="250.0" promptText="Password" style="-fx-text-fill: #ffffff;">
-            <font>
-                <Font size="16.0" />
-            </font></JFXTextField>
         <ImageView fitHeight="57.0" fitWidth="53.0" layoutX="110.0" layoutY="113.0" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../assets/user.png" />
@@ -52,5 +49,10 @@
                 <Font size="14.0" />
             </font>
         </JFXTextField>
+      <JFXPasswordField fx:id="password" focusColor="#03dac6" layoutX="175.0" layoutY="194.0" prefHeight="32.0" prefWidth="250.0" promptText="Password" style="-fx-text-fill: #ffffff;">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </JFXPasswordField>
     </children>
 </AnchorPane>

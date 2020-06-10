@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.ResourceBundle;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 
 import javafx.fxml.FXMLLoader;
@@ -24,7 +25,7 @@ public class LoginController implements Initializable {
     private JFXTextField username;
 
     @FXML
-    private JFXTextField password;
+    private JFXPasswordField password;
 
     @FXML
     private ImageView progress;
@@ -45,25 +46,26 @@ public class LoginController implements Initializable {
     public void loginAction() throws IOException {
         progress.setVisible(true);
 
-        InetAddress ip = null;
-        ip = InetAddress.getByName("localhost");
+        InetAddress ip = InetAddress.getByName("localhost");
 
-        Socket s = null;
-        s = new Socket(ip, ServerPort);
+        Socket s = new Socket(ip, ServerPort);
         DataInputStream dis = new DataInputStream(s.getInputStream());
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
-        dos.writeUTF("LOGIN#" + username.getText() + "#" + password.getText() );
-        if (dis.readUTF().equals("CORRECT")){
-            chatUIDisplay();
-        } else {
-            alert.setVisible(true);
-            progress.setVisible(false);
+        try {
+            dos.writeUTF("LOGIN#" + username.getText() + "#" + password.getText());
+            if (dis.readUTF().equals("CORRECT")) {
+                s.close();
+                chatUIDisplay();
+            } else {
+                alert.setVisible(true);
+                progress.setVisible(false);
+            }
+        } catch (IOException e) {
+            s.close();
         }
-        s.close();
     }
 
-    @FXML
     public void signUpDisplay() throws IOException {
         login.getScene().getWindow().hide();
 
@@ -71,6 +73,7 @@ public class LoginController implements Initializable {
         Parent root = FXMLLoader.load(getClass().getResource("/FXML/SignUpUI.fxml"));
         Scene scene = new Scene(root);
         signup.setScene(scene);
+        signup.setTitle("Seen");
         signup.show();
         signup.setResizable(false);
     }
@@ -78,10 +81,13 @@ public class LoginController implements Initializable {
     public void chatUIDisplay() throws IOException {
         login.getScene().getWindow().hide();
 
-        Stage chatUI = new Stage();
-        Parent root = FXMLLoader.load(getClass().getResource("/FXML/ChatUI.fxml"));
-        Scene scene = new Scene(root);
+        Stage  chatUI = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/ChatUI.fxml"));
+        Scene  scene  = new Scene(loader.load());
+        ChatController controller = loader.getController();
+        controller.setUsername(username.getText());
         chatUI.setScene(scene);
+        chatUI.setTitle("Seen");
         chatUI.show();
         chatUI.setResizable(false);
     }

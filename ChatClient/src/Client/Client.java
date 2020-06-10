@@ -6,15 +6,16 @@ import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
-import java.io.*;
-
-public class Client extends Application {
+public
+class Client extends Application {
     @Override
-    public void start(Stage primaryStage) {
+    public
+    void start(Stage primaryStage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/FXML/LoginUI.fxml"));
-            Scene scene = new Scene(root);
+            Parent root  = FXMLLoader.load(getClass().getResource("/FXML/LoginUI.fxml"));
+            Scene  scene = new Scene(root);
             primaryStage.setScene(scene);
+            primaryStage.setTitle("Seen");
             primaryStage.show();
             primaryStage.setResizable(false);
         } catch(Exception e) {
@@ -22,5 +23,8 @@ public class Client extends Application {
         }
     }
 
-    public static void main(String[] args) throws IOException { launch(args); }
+    public static
+    void main(String[] args) {
+        launch(args);
+    }
 }

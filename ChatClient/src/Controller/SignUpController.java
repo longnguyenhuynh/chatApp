@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import Client.Client;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.event.ActionEvent;
@@ -18,13 +19,12 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 public
 class SignUpController implements Initializable {
-
-    final static int ServerPort = 1234;
 
     @FXML
     private JFXTextField username;
@@ -55,22 +55,18 @@ class SignUpController implements Initializable {
     public
     void signUpAction() throws IOException {
         if (password.getText().equals(repassword.getText())) {
-
             Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
             Matcher match   = pattern.matcher(username.getText());
             boolean val     = match.find();
+
             if (val) {
                 alert.setText("Username must not contain special characters");
                 alert.setVisible(true);
                 progress.setVisible(false);
             } else {
                 progress.setVisible(true);
-
-                InetAddress ip = null;
-                ip = InetAddress.getByName("localhost");
-
-                Socket s = null;
-                s = new Socket(ip, ServerPort);
+                InetAddress ip = InetAddress.getByName(Client.ServerIP);
+                Socket s = new Socket(ip, Client.ServerPort);
                 DataInputStream  dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
@@ -110,6 +106,7 @@ class SignUpController implements Initializable {
         Scene  scene = new Scene(root);
         login.setScene(scene);
         login.setTitle("Seen");
+        login.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         login.show();
         login.setResizable(false);
     }

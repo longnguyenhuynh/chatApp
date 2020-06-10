@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ResourceBundle;
 
+import Client.Client;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
@@ -13,12 +14,11 @@ import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 public class LoginController implements Initializable {
-
-    final static int ServerPort = 1234;
 
     public JFXButton signup;
     @FXML
@@ -46,9 +46,9 @@ public class LoginController implements Initializable {
     public void loginAction() throws IOException {
         progress.setVisible(true);
 
-        InetAddress ip = InetAddress.getByName("localhost");
+        InetAddress ip = InetAddress.getByName(Client.ServerIP);
 
-        Socket s = new Socket(ip, ServerPort);
+        Socket s = new Socket(ip, Client.ServerPort);
         DataInputStream dis = new DataInputStream(s.getInputStream());
         DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
@@ -68,19 +68,18 @@ public class LoginController implements Initializable {
 
     public void signUpDisplay() throws IOException {
         login.getScene().getWindow().hide();
-
         Stage signup = new Stage();
         Parent root = FXMLLoader.load(getClass().getResource("/FXML/SignUpUI.fxml"));
         Scene scene = new Scene(root);
         signup.setScene(scene);
         signup.setTitle("Seen");
+        signup.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         signup.show();
         signup.setResizable(false);
     }
 
     public void chatUIDisplay() throws IOException {
         login.getScene().getWindow().hide();
-
         Stage  chatUI = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/ChatUI.fxml"));
         Scene  scene  = new Scene(loader.load());
@@ -88,6 +87,7 @@ public class LoginController implements Initializable {
         controller.setUsername(username.getText());
         chatUI.setScene(scene);
         chatUI.setTitle("Seen");
+        chatUI.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         chatUI.show();
         chatUI.setResizable(false);
     }

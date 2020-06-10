@@ -2,12 +2,15 @@ package Client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
 public
 class Client extends Application {
+    public static String ServerIP;
+    public static int ServerPort;
     @Override
     public
     void start(Stage primaryStage) {
@@ -16,6 +19,7 @@ class Client extends Application {
             Scene  scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Seen");
+            primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
             primaryStage.show();
             primaryStage.setResizable(false);
         } catch(Exception e) {
@@ -25,6 +29,8 @@ class Client extends Application {
 
     public static
     void main(String[] args) {
+        ServerIP = args[0];
+        ServerPort = Integer.parseInt(args[1]);
         launch(args);
     }
 }

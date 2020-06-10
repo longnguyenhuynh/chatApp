@@ -1,5 +1,6 @@
 package Controller;
 
+import Client.Client;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
@@ -8,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,8 +22,6 @@ import java.util.ResourceBundle;
 
 public
 class ChatController implements Initializable {
-
-    final static int ServerPort = 1234;
 
     private String selectedUser = null;
 
@@ -76,29 +76,29 @@ class ChatController implements Initializable {
         });
 
         InetAddress ip = null;
-
         try {
-            ip = InetAddress.getByName("localhost");
-        } catch (UnknownHostException e) {
+            ip = InetAddress.getByName(Client.ServerIP);
+        } catch(UnknownHostException e) {
             e.printStackTrace();
         }
         Socket s = null;
         try {
-            s = new Socket(ip, ServerPort);
-        } catch (IOException e) {
+            s = new Socket(ip, Client.ServerPort);
+        } catch(IOException e) {
             e.printStackTrace();
         }
         try {
             assert s != null;
             dis = new DataInputStream(s.getInputStream());
-        } catch (IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
         try {
             dos = new DataOutputStream(s.getOutputStream());
-        } catch (IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
+
         Socket finalS = s;
         Thread readMessage = new Thread(() -> {
             while (true) {
@@ -109,28 +109,34 @@ class ChatController implements Initializable {
                     Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
                     switch (msgSplit[0]) {
                         case "NEW_USER":
+                            // msgSplit[1]: username
                             onlineList.getItems().add(msgSplit[1]);
                             break;
                         case "NEW_GROUP":
+                            // msgSplit[1]: groupName
                             onlineList.getItems().add(msgSplit[1].replace("#", ", "));
                             break;
                         case "ALL_USER":
-                            String[] userString = msgSplit[1].split("#");
-                            for (String user : userString) {
+                            // msgSplit[1]: online user name
+                            String[] userName = msgSplit[1].split("#");
+                            for (String user : userName) {
                                 onlineList.getItems().add(user);
                             }
                             break;
                         case "REMOVE_USER":
                         case "REMOVE_GROUP":
+                            // msgSplit[1]: username or groupName
                             onlineList.getItems().remove(msgSplit[1]);
                             break;
                         case "CHAT_DISPLAY":
+                            // msgSplit[1]: messages
                             chatBox.getItems().clear();
                             String[] tmpArray = msgSplit[1].split("#");
                             for (String str : tmpArray)
                                 chatBox.getItems().add(str);
                             break;
                         case "GROUP_NAME_CHANGE":
+                            // msgSplit[1]: new group name + old group name
                             String[] temp = msgSplit[1].split("#");
                             Object[] onlineArray = onlineList.getItems().toArray();
                             for (int i = 0; i < onlineArray.length; i++) {
@@ -142,6 +148,7 @@ class ChatController implements Initializable {
                             selectedUser = temp[0];
                             break;
                         case "GROUP_CHAT":
+                            // msgSplit[1]: toClient + message
                             String[] tmpSplit = msgSplit[1].split("#");
                             if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
                                 chatBox.getItems().add(tmpSplit[1]);
@@ -225,6 +232,7 @@ class ChatController implements Initializable {
             }
         }
         createGroup.setScene(scene);
+        createGroup.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         createGroup.show();
         createGroup.setResizable(false);
     }
@@ -276,6 +284,7 @@ class ChatController implements Initializable {
             }
         }
         createGroup.setScene(scene);
+        createGroup.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         createGroup.show();
         createGroup.setResizable(false);
     }
@@ -296,6 +305,7 @@ class ChatController implements Initializable {
             controller.groupMember.getItems().add(checkBox);
         }
         createGroup.setScene(scene);
+        createGroup.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         createGroup.show();
         createGroup.setResizable(false);
     }

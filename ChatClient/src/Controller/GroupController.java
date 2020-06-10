@@ -1,5 +1,6 @@
 package Controller;
 
+import Client.Client;
 import com.jfoenix.controls.JFXListView;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -11,9 +12,6 @@ import java.net.Socket;
 
 public
 class GroupController {
-
-    final static int ServerPort = 1234;
-
     private String userName;
     private String groupName;
     private String action;
@@ -36,8 +34,8 @@ class GroupController {
 
     public
     void createGroup() throws IOException {
-        InetAddress      ip  = InetAddress.getByName("localhost");
-        Socket           s   = new Socket(ip, ServerPort);
+        InetAddress      ip  = InetAddress.getByName(Client.ServerIP);
+        Socket           s   = new Socket(ip, Client.ServerPort);
         DataOutputStream dos   = new DataOutputStream(s.getOutputStream());
         StringBuilder    group = new StringBuilder();
 

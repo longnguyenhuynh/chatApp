@@ -188,10 +188,10 @@ class ChatController implements Initializable {
                                     if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
                                         chatBox.getItems().add(tmpSplit[1]);
                                     break;
-                                case "FILE": // fromClient + fileName
+                                case "FILE": // fromClient + toClient + fileName
                                     String[] strSplit = msgSplit[1].split("#");
-                                    if (selectedUser != null && selectedUser.equals(strSplit[0])) {
-                                        chatBox.getItems().add(strSplit[0] + ": " + strSplit[1]);
+                                    if (selectedUser != null && selectedUser.equals(strSplit[1])) {
+                                        chatBox.getItems().add(strSplit[0] + ": " + strSplit[2]);
                                     }
                                     break;
                                 default:

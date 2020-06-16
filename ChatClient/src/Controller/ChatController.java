@@ -21,6 +21,7 @@ import java.net.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public
@@ -79,9 +80,16 @@ class ChatController implements Initializable {
         });
         chatBox.setOnMouseClicked(event -> {
             String str = chatBox.getSelectionModel().getSelectedItem();
-            if (str != null && ! str.equals(selectedUser)) {
+            String[]    fileSplit   = str.split(": ");
+            boolean isFile = false;
+            for (Map.Entry me : fileHandler.entrySet()) {
+                if (fileSplit[1].equals(me.getKey())) {
+                    isFile = true;
+                    break;
+                }
+            }
+            if (isFile) {
                 FileChooser fileChooser = new FileChooser();
-                String[]    fileSplit   = str.split(": ");
                 byte[]      fileData    = fileHandler.get(fileSplit[1]);
                 fileChooser.setInitialFileName(fileSplit[1]);
                 try {

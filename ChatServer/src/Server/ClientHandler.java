@@ -35,6 +35,10 @@ class ClientHandler implements Runnable {
                     case "CHAT_DISPLAY":
                         // tmpSplit[0]: username, tmpSplit[1]: username
                         String msg = DBconnection.GetChatData(tmpSplit[0], tmpSplit[1]);
+//                        String[] fileSplit = msg.split("#");
+//                        for (String file : fileSplit) {
+//                            if ()
+//                        }
                         if (msg != null)
                             this.dos.writeUTF("CHAT_DISPLAY#" + msg);
                         break;

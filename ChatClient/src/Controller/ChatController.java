@@ -87,9 +87,7 @@ class ChatController implements Initializable {
                 try {
                     FileOutputStream     fos       = new FileOutputStream(fileChooser.showSaveDialog(null));
                     fos.write(fileData);
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
+                } catch(IOException | NullPointerException ignored){ }
             }
         });
 

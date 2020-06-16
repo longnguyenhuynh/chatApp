@@ -24,7 +24,7 @@ class ClientHandler implements Runnable {
     public
     void run() {
         boolean isFile = false;
-        String received;
+        String  received;
         while (true) {
             try {
                 received = dis.readUTF();
@@ -103,15 +103,10 @@ class ClientHandler implements Runnable {
                 }
             } catch(IOException e) {
                 try {
-                    if (!isFile) {
-                        this.s.close();
-                        Server.clientHandlerVector.remove(this);
-                        RemoveClient(this.name);
-                        break;
-                    }
-                    else {
-                        isFile = false;
-                    }
+                    this.s.close();
+                    Server.clientHandlerVector.remove(this);
+                    RemoveClient(this.name);
+                    break;
                 } catch(IOException ioException) {
                     ioException.printStackTrace();
                 }

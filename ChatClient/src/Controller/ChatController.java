@@ -79,14 +79,18 @@ class ChatController implements Initializable {
             }
         });
         chatBox.setOnMouseClicked(event -> {
-            String str = chatBox.getSelectionModel().getSelectedItem();
-            String[]    fileSplit   = str.split(": ");
-            boolean isFile = false;
-            for (Map.Entry me : fileHandler.entrySet()) {
-                if (fileSplit[1].equals(me.getKey())) {
-                    isFile = true;
-                    break;
+            boolean  isFile = false;
+            String   str       = chatBox.getSelectionModel().getSelectedItem();
+            String[] fileSplit = new String[0];
+            try {
+                fileSplit = str.split(": ");
+                for (Map.Entry me : fileHandler.entrySet()) {
+                    if (fileSplit[1].equals(me.getKey())) {
+                        isFile = true;
+                        break;
+                    }
                 }
+            } catch(NullPointerException ignored) {
             }
             if (isFile) {
                 FileChooser fileChooser = new FileChooser();

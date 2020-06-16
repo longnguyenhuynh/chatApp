@@ -296,6 +296,7 @@ class ChatController implements Initializable {
                         dos.write(byteArray, 0, byteArray.length);
                         dos.flush();
                         chatBox.getItems().add(userName.getText() + ": " + file.getName());
+                        fileHandler.put(file.getName(), byteArray);
                     }
                     assert fis != null;
                     fis.close();

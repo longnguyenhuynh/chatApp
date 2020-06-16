@@ -93,11 +93,13 @@ class ClientHandler implements Runnable {
             } catch(IOException e) {
                 try {
                     if (!isFile) {
-                        isFile = false;
                         this.s.close();
                         Server.clientHandlerVector.remove(this);
                         RemoveClient(this.name);
                         break;
+                    }
+                    else {
+                        isFile = false;
                     }
                 } catch(IOException ioException) {
                     ioException.printStackTrace();

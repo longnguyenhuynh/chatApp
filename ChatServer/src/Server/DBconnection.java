@@ -119,16 +119,32 @@ class DBconnection {
         connection.close();
     }
 
-    public static
-    void SaveFileData(String fileName, byte[] fileData, String fromClient, String toClient) throws SQLException, ClassNotFoundException {
-        Connection        connection = DBHandler.getConnection();
-        String            insert     = "INSERT INTO chatFile(fileName,fileData,fromClient,toClient)" + "VALUES (?,?,?,?)";
-        PreparedStatement pst        = connection.prepareStatement(insert);
-        pst.setString(1, fileName);
-        pst.setString(2, Arrays.toString(fileData));
-        pst.setString(3, fromClient);
-        pst.setString(4, toClient);
-        pst.executeUpdate();
-        connection.close();
-    }
+//    public static
+//    void SaveFileData(String fileName, byte[] fileData, String fromClient, String toClient) throws SQLException, ClassNotFoundException {
+//        Connection        connection = DBHandler.getConnection();
+//        String            insert     = "INSERT INTO chatFile(fileName,fileData,fromClient,toClient)" + "VALUES (?,?,?,?)";
+//        PreparedStatement pst        = connection.prepareStatement(insert);
+//        pst.setString(1, fileName);
+//        pst.setString(2, Arrays.toString(fileData));
+//        pst.setString(3, fromClient);
+//        pst.setString(4, toClient);
+//        pst.executeUpdate();
+//        connection.close();
+//    }
+
+//    public static
+//    String GetFileData() throws SQLException, ClassNotFoundException {
+//        Connection        connection = DBHandler.getConnection();
+//        String            q1         = "SELECT * from chatFile";
+//        PreparedStatement pst        = connection.prepareStatement(q1);
+//        ResultSet     rs            = pst.executeQuery();
+//        StringBuilder stringBuilder = new StringBuilder();
+//        while (rs.next()) {
+//            stringBuilder.append(rs.getString("fileName")).append("#");
+//            stringBuilder.append(rs.getBlob("fileData").getBytes()).append("!");
+//            System.out.println(rs.getBlob("fileData"));
+//        }
+//        connection.close();
+//        return stringBuilder.toString();
+//    }
 }

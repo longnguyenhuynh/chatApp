@@ -1,7 +1,7 @@
 package Server;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 import java.net.*;
@@ -11,10 +11,12 @@ class Server {
 
     static Vector<ClientHandler> clientHandlerVector = new Vector<>();
     static Vector<GroupHandler> groupHandlerVector = new Vector<>();
+    static HashMap<String, String> fileHandler = new HashMap<String, String>();
 
     public static
     void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
         getGroup();
+//        getFile();
 //        ServerSocket ss = new ServerSocket(Integer.parseInt(args[0]));
         ServerSocket ss = new ServerSocket(8080);
         Socket       s;
@@ -111,6 +113,15 @@ class Server {
 
         }
     }
+
+//    private static
+//    void getFile() throws SQLException, ClassNotFoundException {
+//        String[] groupArray = DBconnection.GetFileData().split("!");
+////        for (String group : groupArray) {
+////            String[] file = group.split("#");
+////            fileHandler.put(file[0], file[1]);
+////        }
+//    }
 
     private static
     void getGroup() throws SQLException, ClassNotFoundException {

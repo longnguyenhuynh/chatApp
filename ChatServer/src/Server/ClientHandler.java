@@ -37,10 +37,17 @@ class ClientHandler implements Runnable {
                         String msg = DBconnection.GetChatData(tmpSplit[0], tmpSplit[1]);
 //                        String[] fileSplit = msg.split("#");
 //                        for (String file : fileSplit) {
-//                            if ()
+//                            if (file.contains(".")) {
+//                                for (String i : Server.fileHandler.keySet()) {
+//                                    if (file.equals(i)) {
+//                                        this.dos.writeUTF("FILE_DATA#" + i + "#" + Server.fileHandler.get(i).length());
+//                                        this.dos.write(Server.fileHandler.get(i));
+//                                        break;
+//                                    }
+//                                }
+//                            }
 //                        }
-                        if (msg != null)
-                            this.dos.writeUTF("CHAT_DISPLAY#" + msg);
+                        this.dos.writeUTF("CHAT_DISPLAY#" + msg);
                         break;
                     case "GROUP_CHAT_DISPLAY":
                         // msgSplit[1]: groupName
@@ -83,7 +90,7 @@ class ClientHandler implements Runnable {
                                 int    fileLength = Integer.parseInt(tmpSplit[3]);
                                 byte[] byteArray  = new byte[fileLength];
                                 dis.read(byteArray, 0, fileLength);
-                                DBconnection.SaveFileData(tmpSplit[2], byteArray, tmpSplit[0], tmpSplit[1]);
+//                                DBconnection.SaveFileData(tmpSplit[2], byteArray, tmpSplit[0], tmpSplit[1]);
                                 DBconnection.SaveChatData(tmpSplit[0], tmpSplit[1], tmpSplit[0] + ": " + tmpSplit[2]);
                                 clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[2]);
                                 clientHandler.dos.writeUTF("FILE_DATA#" + tmpSplit[2] + "#" + fileLength);

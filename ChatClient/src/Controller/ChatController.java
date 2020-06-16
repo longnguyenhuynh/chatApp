@@ -19,11 +19,14 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public
 class ChatController implements Initializable {
+
+    HashMap<String, byte[]> fileHandler = new HashMap<>();
 
     private String selectedUser = null;
 
@@ -46,7 +49,6 @@ class ChatController implements Initializable {
 
     private DataInputStream dis;
     private DataOutputStream dos;
-
 
     @Override
     public
@@ -75,25 +77,21 @@ class ChatController implements Initializable {
                 }
             }
         });
-//        chatBox.setOnMouseClicked(event -> {
-//            String str = chatBox.getSelectionModel().getSelectedItem();
-//            if (str != null) {
-//                FileChooser fileChooser     = new FileChooser(); // fromClient + fileName + fileLength
-//                String[]    fileSplit       = str.split(": ");
-//                String[]    file            = fileSplit[1].split(", "); // fileName + fileLength
-//                String[]    fileLengthSplit = file[1].split(" "); // fileLength
-//                fileChooser.setInitialFileName(file[0]);
-//                int fileLength = Integer.parseInt(fileLengthSplit[0]);
-//                try {
-//                    byte[]               byteArray = new byte[fileLength];
-//                    FileOutputStream     fos       = new FileOutputStream(fileChooser.showSaveDialog(null));
-//                    BufferedOutputStream bos       = new BufferedOutputStream(fos);
-//                    bos.write(byteArray, 0, fileLength);
-//                } catch(IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        chatBox.setOnMouseClicked(event -> {
+            String str = chatBox.getSelectionModel().getSelectedItem();
+            if (str != null) {
+                FileChooser fileChooser     = new FileChooser();
+                String[] fileSplit = str.split(": ");
+                byte[]   fileData  = fileHandler.get(fileSplit[1]);
+                fileChooser.setInitialFileName(fileSplit[1]);
+                try {
+                    FileOutputStream     fos       = new FileOutputStream(fileChooser.showSaveDialog(null));
+                    fos.write(fileData);
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         InetAddress ip = null;
         try {
@@ -123,73 +121,76 @@ class ChatController implements Initializable {
         Thread readMessage = new Thread(() -> {
             while (true) {
                 try {
-                    String msg = dis.readUTF();
-                    // break the string into message and recipient part
-                    String[] msgSplit = msg.split("#", 2);
-                    Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
-                        switch (msgSplit[0]) {
-                            case "NEW_USER":
-                                // msgSplit[1]: username
-                                onlineList.getItems().add(msgSplit[1]);
-                                break;
-                            case "NEW_GROUP":
-                                // msgSplit[1]: groupName
-                                onlineList.getItems().add(msgSplit[1].replace("#", ", "));
-                                break;
-                            case "ALL_USER":
-                                // msgSplit[1]: online user name
-                                String[] userName = msgSplit[1].split("#");
-                                for (String user : userName) {
-                                    onlineList.getItems().add(user);
-                                }
-                                break;
-                            case "REMOVE_USER":
-                            case "REMOVE_GROUP":
-                                // msgSplit[1]: username or groupName
-                                onlineList.getItems().remove(msgSplit[1]);
-                                break;
-                            case "CHAT_DISPLAY":
-                                // msgSplit[1]: messages
-                                chatBox.getItems().clear();
-                                String[] tmpArray = msgSplit[1].split("#");
-                                for (String str : tmpArray)
-                                    chatBox.getItems().add(str);
-                                break;
-                            case "GROUP_NAME_CHANGE":
-                                // msgSplit[1]: new group name + old group name
-                                String[] temp = msgSplit[1].split("#");
-                                Object[] onlineArray = onlineList.getItems().toArray();
-                                for (int i = 0; i < onlineArray.length; i++) {
-                                    if (onlineArray[i].toString().equals(temp[1])) {
-                                        onlineList.getItems().set(i, temp[0]);
-                                        break;
+                    String   msg      = dis.readUTF();
+                    if (msg.contains("FILE_DATA#")) { // fileName + fileLength
+                        String[] tmpSplit = msg.split("#");
+                        int fileLength = Integer.parseInt(tmpSplit[2]);
+                        byte[] bytes = new byte[fileLength];
+                        dis.read(bytes, 0, fileLength);
+                        fileHandler.put(tmpSplit[1], bytes);
+                    }
+                    else {
+                        String[] msgSplit = msg.split("#", 2);
+                        Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
+                            switch (msgSplit[0]) {
+                                case "NEW_USER":
+                                    // msgSplit[1]: username
+                                    onlineList.getItems().add(msgSplit[1]);
+                                    break;
+                                case "NEW_GROUP":
+                                    // msgSplit[1]: groupName
+                                    onlineList.getItems().add(msgSplit[1].replace("#", ", "));
+                                    break;
+                                case "ALL_USER":
+                                    // msgSplit[1]: online user name
+                                    String[] userName = msgSplit[1].split("#");
+                                    for (String user : userName) {
+                                        onlineList.getItems().add(user);
                                     }
-                                }
-                                selectedUser = temp[0];
-                                break;
-                            case "GROUP_CHAT":
-                                // msgSplit[1]: toClient + message
-                                String[] tmpSplit = msgSplit[1].split("#");
-                                if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
-                                    chatBox.getItems().add(tmpSplit[1]);
-                                break;
-                            case "CHAT":
-                                if (selectedUser != null && selectedUser.equals(msgSplit[0]))
-                                    chatBox.getItems().add(msgSplit[1]);
-                                break;
-                            case "FILE": // fromClient + fileName + fileLength
-                                String[] split = msgSplit[1].split("#");
-                                int fileLength = Integer.parseInt(split[2]);
-                                byte[] byteArray = new byte[fileLength];
-                                chatBox.getItems().add(split[0] + ": " + split[1] + ", " + split[2] + " Bytes");
-                                try {
-                                    dis.read(byteArray, 0, fileLength);
-                                } catch(IOException e) {
-                                    e.printStackTrace();
-                                }
-                                break;
-                        }
-                    });
+                                    break;
+                                case "REMOVE_USER":
+                                case "REMOVE_GROUP":
+                                    // msgSplit[1]: username or groupName
+                                    onlineList.getItems().remove(msgSplit[1]);
+                                    break;
+                                case "CHAT_DISPLAY":
+                                    // msgSplit[1]: messages
+                                    chatBox.getItems().clear();
+                                    String[] tmpArray = msgSplit[1].split("#");
+                                    for (String str : tmpArray)
+                                        chatBox.getItems().add(str);
+                                    break;
+                                case "GROUP_NAME_CHANGE":
+                                    // msgSplit[1]: new group name + old group name
+                                    String[] temp = msgSplit[1].split("#");
+                                    Object[] onlineArray = onlineList.getItems().toArray();
+                                    for (int i = 0; i < onlineArray.length; i++) {
+                                        if (onlineArray[i].toString().equals(temp[1])) {
+                                            onlineList.getItems().set(i, temp[0]);
+                                            break;
+                                        }
+                                    }
+                                    selectedUser = temp[0];
+                                    break;
+                                case "GROUP_CHAT":
+                                    // msgSplit[1]: toClient + message
+                                    String[] tmpSplit = msgSplit[1].split("#");
+                                    if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
+                                        chatBox.getItems().add(tmpSplit[1]);
+                                    break;
+                                case "CHAT":
+                                    if (selectedUser != null && selectedUser.equals(msgSplit[0]))
+                                        chatBox.getItems().add(msgSplit[1]);
+                                    break;
+                                case "FILE": // fromClient + fileName
+                                    String[] strSplit = msgSplit[1].split("#");
+                                    if (selectedUser != null && selectedUser.equals(strSplit[0])) {
+                                        chatBox.getItems().add(strSplit[0] + ": " + strSplit[1]);
+                                    }
+                                    break;
+                            }
+                        });
+                    }
                 } catch(IOException e) {
                     try {
                         finalS.close();
@@ -283,28 +284,26 @@ class ChatController implements Initializable {
     void fileSend() {
         try {
             if (selectedUser != null) {
-                FileInputStream     fis         = null;
-                BufferedInputStream bis         = null;
-                FileChooser         fileChooser = new FileChooser();
+                FileInputStream     fis           = null;
+                BufferedInputStream bis           = null;
+                FileChooser         fileChooser   = new FileChooser();
                 List<File>          selectedFiles = fileChooser.showOpenMultipleDialog(null);
                 if (selectedFiles != null) {
                     InetAddress ip = InetAddress.getByName(Client.ServerIP);
                     Socket      s  = new Socket(ip, Client.ServerPort);
                     dos = new DataOutputStream(s.getOutputStream());
-                    dos.writeUTF("FILE#" + userName.getText() + "#" + selectedUser);
+
                     for (File file : selectedFiles) {
                         byte[] byteArray = new byte[(int) file.length()];
                         fis = new FileInputStream(file);
                         bis = new BufferedInputStream(fis);
                         bis.read(byteArray, 0, byteArray.length);
-                        dos.writeUTF(file.getName() + "#" + byteArray.length);
+                        dos.writeUTF("FILE#" + userName.getText() + "#" + selectedUser + "#" + file.getName() + "#" + byteArray.length);
                         dos.write(byteArray, 0, byteArray.length);
-                        dos.flush();
                     }
                     assert fis != null;
                     fis.close();
                     bis.close();
-                    s.close();
                 }
             }
         } catch(IOException e) {

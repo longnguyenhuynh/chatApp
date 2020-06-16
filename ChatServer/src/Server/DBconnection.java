@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public
 class DBconnection {
@@ -114,6 +115,17 @@ class DBconnection {
         PreparedStatement pst        = connection.prepareStatement(q1);
         pst.setString(1, newGroupName);
         pst.setString(2, oldGroupName);
+        pst.executeUpdate();
+        connection.close();
+    }
+
+    public static
+    void SaveFileData(String fileName, byte[] fileData) throws SQLException, ClassNotFoundException {
+        Connection connection = DBHandler.getConnection();
+        String            insert = "INSERT INTO chatFile(fileName,fileData)" + "VALUES (?,?)";
+        PreparedStatement pst    = connection.prepareStatement(insert);
+        pst.setString(1, fileName);
+        pst.setString(2, Arrays.toString(fileData));
         pst.executeUpdate();
         connection.close();
     }

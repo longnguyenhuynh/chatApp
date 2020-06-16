@@ -298,6 +298,7 @@ class ChatController implements Initializable {
                         bis.read(byteArray, 0, byteArray.length);
                         dos.writeUTF("FILE#" + userName.getText() + "#" + selectedUser + "#" + file.getName() + "#" + byteArray.length);
                         dos.write(byteArray, 0, byteArray.length);
+                        dos.flush();
                     }
                     assert fis != null;
                     fis.close();

@@ -104,21 +104,6 @@ class Server {
                         Thread t = new Thread(client);
                         t.start();
                         break;
-                    case "FILE": // fromCLient + toClient + fileName + fileLength
-                        String[] tempSplit = receivedSplit[2].split("#"); // toClient + fileName + fileLength
-                        for (ClientHandler clientHandler : Server.clientHandlerVector) {
-                            if (clientHandler.name.equals(tempSplit[0])) {
-                                int    fileLength = Integer.parseInt(tempSplit[2]);
-                                byte[] byteArray  = new byte[fileLength];
-                                dis.read(byteArray, 0, fileLength);
-                                DBconnection.SaveFileData(tempSplit[1], byteArray);
-                                clientHandler.dos.writeUTF("FILE#" + receivedSplit[1] + "#" + tempSplit[1]);
-                                clientHandler.dos.writeUTF("FILE_DATA#" +  tempSplit[1] + "#" + fileLength);
-                                clientHandler.dos.write(byteArray, 0, fileLength);
-                                clientHandler.dos.flush();
-                            }
-                        }
-                        break;
                 }
             } catch(IOException e) {
                 s.close();

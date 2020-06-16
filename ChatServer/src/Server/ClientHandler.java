@@ -71,6 +71,22 @@ class ClientHandler implements Runnable {
                             }
                         }
                         break;
+                    case "FILE": // fromCLient + toClient + fileName + fileLength
+                        for (ClientHandler clientHandler : Server.clientHandlerVector) {
+                            if (clientHandler.name.equals(tmpSplit[1])) {
+                                int    fileLength = Integer.parseInt(tmpSplit[3]);
+                                byte[] byteArray  = new byte[fileLength];
+                                dis.read(byteArray, 0, fileLength);
+                                DBconnection.SaveFileData(tmpSplit[2], byteArray, tmpSplit[0], tmpSplit[1]);
+                                DBconnection.SaveChatData(tmpSplit[0], tmpSplit[1], tmpSplit[0] + ": " + tmpSplit[2]);
+                                clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[2]);
+                                clientHandler.dos.writeUTF("FILE_DATA#" + tmpSplit[2] + "#" + fileLength);
+                                clientHandler.dos.write(byteArray, 0, fileLength);
+                                clientHandler.dos.flush();
+                                break;
+                            }
+                        }
+                        break;
                 }
             } catch(IOException e) {
                 try {

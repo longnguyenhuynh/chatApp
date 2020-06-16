@@ -79,15 +79,16 @@ class ChatController implements Initializable {
         });
         chatBox.setOnMouseClicked(event -> {
             String str = chatBox.getSelectionModel().getSelectedItem();
-            if (str != null) {
-                FileChooser fileChooser     = new FileChooser();
-                String[] fileSplit = str.split(": ");
-                byte[]   fileData  = fileHandler.get(fileSplit[1]);
+            if (str != null && ! str.equals(selectedUser)) {
+                FileChooser fileChooser = new FileChooser();
+                String[]    fileSplit   = str.split(": ");
+                byte[]      fileData    = fileHandler.get(fileSplit[1]);
                 fileChooser.setInitialFileName(fileSplit[1]);
                 try {
-                    FileOutputStream     fos       = new FileOutputStream(fileChooser.showSaveDialog(null));
+                    FileOutputStream fos = new FileOutputStream(fileChooser.showSaveDialog(null));
                     fos.write(fileData);
-                } catch(IOException | NullPointerException ignored){ }
+                } catch(IOException | NullPointerException ignored) {
+                }
             }
         });
 
@@ -119,15 +120,15 @@ class ChatController implements Initializable {
         Thread readMessage = new Thread(() -> {
             while (true) {
                 try {
-                    String   msg      = dis.readUTF();
+                    String msg = dis.readUTF();
+                    System.out.println(msg);
                     if (msg.contains("FILE_DATA#")) { // fileName + fileLength
-                        String[] tmpSplit = msg.split("#");
-                        int fileLength = Integer.parseInt(tmpSplit[2]);
-                        byte[] bytes = new byte[fileLength];
+                        String[] tmpSplit   = msg.split("#");
+                        int      fileLength = Integer.parseInt(tmpSplit[2]);
+                        byte[]   bytes      = new byte[fileLength];
                         dis.read(bytes, 0, fileLength);
                         fileHandler.put(tmpSplit[1], bytes);
-                    }
-                    else {
+                    } else {
                         String[] msgSplit = msg.split("#", 2);
                         Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
                             switch (msgSplit[0]) {
@@ -176,15 +177,15 @@ class ChatController implements Initializable {
                                     if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
                                         chatBox.getItems().add(tmpSplit[1]);
                                     break;
-                                case "CHAT":
-                                    if (selectedUser != null && selectedUser.equals(msgSplit[0]))
-                                        chatBox.getItems().add(msgSplit[1]);
-                                    break;
                                 case "FILE": // fromClient + fileName
                                     String[] strSplit = msgSplit[1].split("#");
                                     if (selectedUser != null && selectedUser.equals(strSplit[0])) {
                                         chatBox.getItems().add(strSplit[0] + ": " + strSplit[1]);
                                     }
+                                    break;
+                                default:
+                                    if (selectedUser != null && selectedUser.equals(msgSplit[0]))
+                                        chatBox.getItems().add(msgSplit[1]);
                                     break;
                             }
                         });
@@ -287,10 +288,6 @@ class ChatController implements Initializable {
                 FileChooser         fileChooser   = new FileChooser();
                 List<File>          selectedFiles = fileChooser.showOpenMultipleDialog(null);
                 if (selectedFiles != null) {
-                    InetAddress ip = InetAddress.getByName(Client.ServerIP);
-                    Socket      s  = new Socket(ip, Client.ServerPort);
-                    dos = new DataOutputStream(s.getOutputStream());
-
                     for (File file : selectedFiles) {
                         byte[] byteArray = new byte[(int) file.length()];
                         fis = new FileInputStream(file);
@@ -299,6 +296,7 @@ class ChatController implements Initializable {
                         dos.writeUTF("FILE#" + userName.getText() + "#" + selectedUser + "#" + file.getName() + "#" + byteArray.length);
                         dos.write(byteArray, 0, byteArray.length);
                         dos.flush();
+                        chatBox.getItems().add(userName.getText() + ": " + file.getName());
                     }
                     assert fis != null;
                     fis.close();

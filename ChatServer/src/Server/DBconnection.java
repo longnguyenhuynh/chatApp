@@ -120,12 +120,14 @@ class DBconnection {
     }
 
     public static
-    void SaveFileData(String fileName, byte[] fileData) throws SQLException, ClassNotFoundException {
-        Connection connection = DBHandler.getConnection();
-        String            insert = "INSERT INTO chatFile(fileName,fileData)" + "VALUES (?,?)";
-        PreparedStatement pst    = connection.prepareStatement(insert);
+    void SaveFileData(String fileName, byte[] fileData, String fromClient, String toClient) throws SQLException, ClassNotFoundException {
+        Connection        connection = DBHandler.getConnection();
+        String            insert     = "INSERT INTO chatFile(fileName,fileData,fromClient,toClient)" + "VALUES (?,?,?,?)";
+        PreparedStatement pst        = connection.prepareStatement(insert);
         pst.setString(1, fileName);
         pst.setString(2, Arrays.toString(fileData));
+        pst.setString(3, fromClient);
+        pst.setString(4, toClient);
         pst.executeUpdate();
         connection.close();
     }

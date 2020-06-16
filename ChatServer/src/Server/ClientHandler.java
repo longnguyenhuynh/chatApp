@@ -27,6 +27,7 @@ class ClientHandler implements Runnable {
         String  received;
         while (true) {
             try {
+                isFile = false;
                 received = dis.readUTF();
                 // break the string into message and recipient part
                 String[] msgSplit = received.split("#", 2);
@@ -47,7 +48,8 @@ class ClientHandler implements Runnable {
 //                                }
 //                            }
 //                        }
-                        this.dos.writeUTF("CHAT_DISPLAY#" + msg);
+                        if (msg != null)
+                            this.dos.writeUTF("CHAT_DISPLAY#" + msg);
                         break;
                     case "GROUP_CHAT_DISPLAY":
                         // msgSplit[1]: groupName
@@ -91,11 +93,10 @@ class ClientHandler implements Runnable {
                                 byte[] byteArray  = new byte[fileLength];
                                 dis.read(byteArray, 0, fileLength);
 //                                DBconnection.SaveFileData(tmpSplit[2], byteArray, tmpSplit[0], tmpSplit[1]);
-                                DBconnection.SaveChatData(tmpSplit[0], tmpSplit[1], tmpSplit[0] + ": " + tmpSplit[2]);
+//                                DBconnection.SaveChatData(tmpSplit[0], tmpSplit[1], tmpSplit[0] + ": " + tmpSplit[2]);
                                 clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[2]);
                                 clientHandler.dos.writeUTF("FILE_DATA#" + tmpSplit[2] + "#" + fileLength);
                                 clientHandler.dos.write(byteArray, 0, fileLength);
-                                clientHandler.dos.flush();
                                 break;
                             }
                         }
@@ -103,10 +104,12 @@ class ClientHandler implements Runnable {
                 }
             } catch(IOException e) {
                 try {
-                    this.s.close();
-                    Server.clientHandlerVector.remove(this);
-                    RemoveClient(this.name);
-                    break;
+                    if (!isFile) {
+                        this.s.close();
+                        Server.clientHandlerVector.remove(this);
+                        RemoveClient(this.name);
+                        break;
+                    }
                 } catch(IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -117,7 +120,7 @@ class ClientHandler implements Runnable {
         }
     }
 
-    void RemoveClient(String name) throws IOException {
+    void RemoveClient(String name) throws IOException{
         for (ClientHandler clientHandler : Server.clientHandlerVector) {
             clientHandler.dos.writeUTF("REMOVE_USER#" + name);
         }

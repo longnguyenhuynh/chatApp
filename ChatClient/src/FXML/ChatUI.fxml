@@ -34,6 +34,11 @@
                     </image>
                 </ImageView>
                 <JFXTextField fx:id="message" focusColor="#4d4d4d" layoutX="44.0" layoutY="17.0" onKeyPressed="#textBoxSend" prefHeight="26.0" prefWidth="482.0" promptText="Enter your message" />
+            <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="8.0" layoutY="15.0" onMouseClicked="#fileSend" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../assets/attach.png" />
+               </image>
+            </ImageView>
             </children>
         </Pane>
         <JFXListView fx:id="chatBox" layoutX="220.0" prefHeight="639.0" prefWidth="580.0" />

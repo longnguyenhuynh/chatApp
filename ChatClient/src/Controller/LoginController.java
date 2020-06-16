@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
@@ -90,5 +91,6 @@ public class LoginController implements Initializable {
         chatUI.getIcons().add(new Image(getClass().getResourceAsStream("/assets/tick.png")));
         chatUI.show();
         chatUI.setResizable(false);
+        chatUI.setOnCloseRequest(e -> System.exit(0));
     }
 }

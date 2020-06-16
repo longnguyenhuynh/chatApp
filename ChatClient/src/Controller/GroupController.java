@@ -23,10 +23,12 @@ class GroupController {
     void setUsername(String username) {
         userName = username;
     }
+
     public
     void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
     public
     void setAction(String actionToDo) {
         action = actionToDo;
@@ -34,8 +36,8 @@ class GroupController {
 
     public
     void createGroup() throws IOException {
-        InetAddress      ip  = InetAddress.getByName(Client.ServerIP);
-        Socket           s   = new Socket(ip, Client.ServerPort);
+        InetAddress      ip    = InetAddress.getByName(Client.ServerIP);
+        Socket           s     = new Socket(ip, Client.ServerPort);
         DataOutputStream dos   = new DataOutputStream(s.getOutputStream());
         StringBuilder    group = new StringBuilder();
 
@@ -65,7 +67,7 @@ class GroupController {
             dos.writeUTF(group.toString());
             s.close();
             groupMember.getScene().getWindow().hide();
-        } catch (IOException e) {
+        } catch(IOException e) {
             s.close();
         }
     }

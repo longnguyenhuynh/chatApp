@@ -13,11 +13,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.*;
 
+import java.util.List;
 import java.util.ResourceBundle;
 
 public
@@ -56,11 +58,10 @@ class ChatController implements Initializable {
                 selectedUser = str;
                 try {
                     chatBox.getItems().clear();
-                    if (str.indexOf(',') != -1) {
+                    if (str.indexOf(',') != - 1) {
                         GroupAddRemoveOn();
                         dos.writeUTF("GROUP_CHAT_DISPLAY#" + str);
-                    }
-                    else {
+                    } else {
                         GroupAddRemoveOff();
                         String tmp = this.userName.getText();
                         if (tmp.compareTo(selectedUser) > 0) {
@@ -69,11 +70,30 @@ class ChatController implements Initializable {
                             dos.writeUTF("CHAT_DISPLAY#" + selectedUser + "#" + tmp);
                         }
                     }
-                } catch (IOException e) {
+                } catch(IOException e) {
                     e.printStackTrace();
                 }
             }
         });
+//        chatBox.setOnMouseClicked(event -> {
+//            String str = chatBox.getSelectionModel().getSelectedItem();
+//            if (str != null) {
+//                FileChooser fileChooser     = new FileChooser(); // fromClient + fileName + fileLength
+//                String[]    fileSplit       = str.split(": ");
+//                String[]    file            = fileSplit[1].split(", "); // fileName + fileLength
+//                String[]    fileLengthSplit = file[1].split(" "); // fileLength
+//                fileChooser.setInitialFileName(file[0]);
+//                int fileLength = Integer.parseInt(fileLengthSplit[0]);
+//                try {
+//                    byte[]               byteArray = new byte[fileLength];
+//                    FileOutputStream     fos       = new FileOutputStream(fileChooser.showSaveDialog(null));
+//                    BufferedOutputStream bos       = new BufferedOutputStream(fos);
+//                    bos.write(byteArray, 0, fileLength);
+//                } catch(IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         InetAddress ip = null;
         try {
@@ -105,64 +125,75 @@ class ChatController implements Initializable {
                 try {
                     String msg = dis.readUTF();
                     // break the string into message and recipient part
-                    String[] msgSplit     = msg.split("#", 2);
+                    String[] msgSplit = msg.split("#", 2);
                     Platform.runLater(() -> { // for java.lang.IllegalStateException: Not on FX application thread
-                    switch (msgSplit[0]) {
-                        case "NEW_USER":
-                            // msgSplit[1]: username
-                            onlineList.getItems().add(msgSplit[1]);
-                            break;
-                        case "NEW_GROUP":
-                            // msgSplit[1]: groupName
-                            onlineList.getItems().add(msgSplit[1].replace("#", ", "));
-                            break;
-                        case "ALL_USER":
-                            // msgSplit[1]: online user name
-                            String[] userName = msgSplit[1].split("#");
-                            for (String user : userName) {
-                                onlineList.getItems().add(user);
-                            }
-                            break;
-                        case "REMOVE_USER":
-                        case "REMOVE_GROUP":
-                            // msgSplit[1]: username or groupName
-                            onlineList.getItems().remove(msgSplit[1]);
-                            break;
-                        case "CHAT_DISPLAY":
-                            // msgSplit[1]: messages
-                            chatBox.getItems().clear();
-                            String[] tmpArray = msgSplit[1].split("#");
-                            for (String str : tmpArray)
-                                chatBox.getItems().add(str);
-                            break;
-                        case "GROUP_NAME_CHANGE":
-                            // msgSplit[1]: new group name + old group name
-                            String[] temp = msgSplit[1].split("#");
-                            Object[] onlineArray = onlineList.getItems().toArray();
-                            for (int i = 0; i < onlineArray.length; i++) {
-                                if (onlineArray[i].toString().equals(temp[1])) {
-                                    onlineList.getItems().set(i, temp[0]);
-                                    break;
+                        switch (msgSplit[0]) {
+                            case "NEW_USER":
+                                // msgSplit[1]: username
+                                onlineList.getItems().add(msgSplit[1]);
+                                break;
+                            case "NEW_GROUP":
+                                // msgSplit[1]: groupName
+                                onlineList.getItems().add(msgSplit[1].replace("#", ", "));
+                                break;
+                            case "ALL_USER":
+                                // msgSplit[1]: online user name
+                                String[] userName = msgSplit[1].split("#");
+                                for (String user : userName) {
+                                    onlineList.getItems().add(user);
                                 }
-                            }
-                            selectedUser = temp[0];
-                            break;
-                        case "GROUP_CHAT":
-                            // msgSplit[1]: toClient + message
-                            String[] tmpSplit = msgSplit[1].split("#");
-                            if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
-                                chatBox.getItems().add(tmpSplit[1]);
-                            break;
-                        case "CHAT":
-                            if (selectedUser != null && selectedUser.equals(msgSplit[0]))
-                                chatBox.getItems().add(msgSplit[1]);
-                            break;
-                    }
+                                break;
+                            case "REMOVE_USER":
+                            case "REMOVE_GROUP":
+                                // msgSplit[1]: username or groupName
+                                onlineList.getItems().remove(msgSplit[1]);
+                                break;
+                            case "CHAT_DISPLAY":
+                                // msgSplit[1]: messages
+                                chatBox.getItems().clear();
+                                String[] tmpArray = msgSplit[1].split("#");
+                                for (String str : tmpArray)
+                                    chatBox.getItems().add(str);
+                                break;
+                            case "GROUP_NAME_CHANGE":
+                                // msgSplit[1]: new group name + old group name
+                                String[] temp = msgSplit[1].split("#");
+                                Object[] onlineArray = onlineList.getItems().toArray();
+                                for (int i = 0; i < onlineArray.length; i++) {
+                                    if (onlineArray[i].toString().equals(temp[1])) {
+                                        onlineList.getItems().set(i, temp[0]);
+                                        break;
+                                    }
+                                }
+                                selectedUser = temp[0];
+                                break;
+                            case "GROUP_CHAT":
+                                // msgSplit[1]: toClient + message
+                                String[] tmpSplit = msgSplit[1].split("#");
+                                if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
+                                    chatBox.getItems().add(tmpSplit[1]);
+                                break;
+                            case "CHAT":
+                                if (selectedUser != null && selectedUser.equals(msgSplit[0]))
+                                    chatBox.getItems().add(msgSplit[1]);
+                                break;
+                            case "FILE": // fromClient + fileName + fileLength
+                                String[] split = msgSplit[1].split("#");
+                                int fileLength = Integer.parseInt(split[2]);
+                                byte[] byteArray = new byte[fileLength];
+                                chatBox.getItems().add(split[0] + ": " + split[1] + ", " + split[2] + " Bytes");
+                                try {
+                                    dis.read(byteArray, 0, fileLength);
+                                } catch(IOException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                        }
                     });
-                } catch (IOException e) {
+                } catch(IOException e) {
                     try {
                         finalS.close();
-                    } catch (IOException ioException) {
+                    } catch(IOException ioException) {
                         ioException.printStackTrace();
                     }
                 }
@@ -187,13 +218,12 @@ class ChatController implements Initializable {
     void sendMessage() {
         try {
             if (selectedUser != null) {
-                if (selectedUser.indexOf(',') != -1) {
+                if (selectedUser.indexOf(',') != - 1) {
                     String to      = selectedUser;
                     String yourMsg = userName.getText() + ": " + message.getText();
                     dos.writeUTF("GROUP_CHAT#" + to + "#" + yourMsg);
                     message.clear();
-                }
-                else {
+                } else {
                     String from    = userName.getText();
                     String to      = selectedUser;
                     String yourMsg = from + ": " + message.getText();
@@ -203,7 +233,7 @@ class ChatController implements Initializable {
                     message.clear();
                 }
             }
-        } catch (IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }
@@ -216,14 +246,14 @@ class ChatController implements Initializable {
 
     public
     void createGroupChat() throws IOException {
-        Stage          createGroup     = new Stage();
-        FXMLLoader     loader     = new FXMLLoader(getClass().getResource("/FXML/Group.fxml"));
-        Scene           scene      = new Scene(loader.load());
-        GroupController controller = loader.getController();
+        Stage           createGroup = new Stage();
+        FXMLLoader      loader      = new FXMLLoader(getClass().getResource("/FXML/Group.fxml"));
+        Scene           scene       = new Scene(loader.load());
+        GroupController controller  = loader.getController();
         controller.setAction("CREATE_GROUP");
         controller.setUsername(userName.getText());
         String tmp = getOnlineUser();
-        if (tmp != null && !tmp.trim().isEmpty()) {
+        if (tmp != null && ! tmp.trim().isEmpty()) {
             String[] onlineUser = tmp.split("#");
             for (String user : onlineUser) {
                 CheckBox checkBox = new CheckBox();
@@ -242,7 +272,7 @@ class ChatController implements Initializable {
         StringBuilder stringBuilder = new StringBuilder();
         Object[]      onlineArray   = onlineList.getItems().toArray();
         for (Object o : onlineArray) {
-            if (o.toString().indexOf(',') == - 1 && !o.toString().equals(userName.getText())) {
+            if (o.toString().indexOf(',') == - 1 && ! o.toString().equals(userName.getText())) {
                 stringBuilder.append(o.toString()).append("#");
             }
         }
@@ -251,22 +281,50 @@ class ChatController implements Initializable {
 
     public
     void fileSend() {
-
+        try {
+            if (selectedUser != null) {
+                FileInputStream     fis         = null;
+                BufferedInputStream bis         = null;
+                FileChooser         fileChooser = new FileChooser();
+                List<File>          selectedFiles = fileChooser.showOpenMultipleDialog(null);
+                if (selectedFiles != null) {
+                    InetAddress ip = InetAddress.getByName(Client.ServerIP);
+                    Socket      s  = new Socket(ip, Client.ServerPort);
+                    dos = new DataOutputStream(s.getOutputStream());
+                    dos.writeUTF("FILE#" + userName.getText() + "#" + selectedUser);
+                    for (File file : selectedFiles) {
+                        byte[] byteArray = new byte[(int) file.length()];
+                        fis = new FileInputStream(file);
+                        bis = new BufferedInputStream(fis);
+                        bis.read(byteArray, 0, byteArray.length);
+                        dos.writeUTF(file.getName() + "#" + byteArray.length);
+                        dos.write(byteArray, 0, byteArray.length);
+                        dos.flush();
+                    }
+                    assert fis != null;
+                    fis.close();
+                    bis.close();
+                    s.close();
+                }
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public
     void groupAdd() throws IOException {
-        Stage          createGroup     = new Stage();
-        FXMLLoader     loader     = new FXMLLoader(getClass().getResource("/FXML/Group.fxml"));
-        Scene           scene      = new Scene(loader.load());
-        GroupController controller = loader.getController();
+        Stage           createGroup = new Stage();
+        FXMLLoader      loader      = new FXMLLoader(getClass().getResource("/FXML/Group.fxml"));
+        Scene           scene       = new Scene(loader.load());
+        GroupController controller  = loader.getController();
         controller.setAction("ADD_CLIENT");
         controller.setGroupName(selectedUser);
-        String          tmp        = getOnlineUser();
+        String   tmp      = getOnlineUser();
         String[] tmpSplit = tmp.split("#"); // User online
         String[] strSplit = selectedUser.split(","); // User already in group
         for (String temp : tmpSplit) {
-            if (temp.indexOf(',') == -1) {
+            if (temp.indexOf(',') == - 1) {
                 for (String str : strSplit) {
                     if (temp.equals(str)) {
                         tmp = tmp.replace(temp + "#", "");
@@ -277,7 +335,7 @@ class ChatController implements Initializable {
         }
         tmpSplit = tmp.split("#");
         for (String user : tmpSplit) {
-            if (user != null && !user.trim().isEmpty()) {
+            if (user != null && ! user.trim().isEmpty()) {
                 CheckBox checkBox = new CheckBox();
                 checkBox.setText(user);
                 controller.groupMember.getItems().add(checkBox);
@@ -291,14 +349,14 @@ class ChatController implements Initializable {
 
     public
     void groupRemove() throws IOException {
-        Stage          createGroup     = new Stage();
-        FXMLLoader     loader     = new FXMLLoader(getClass().getResource("/FXML/Group.fxml"));
-        Scene           scene      = new Scene(loader.load());
-        GroupController controller = loader.getController();
+        Stage           createGroup = new Stage();
+        FXMLLoader      loader      = new FXMLLoader(getClass().getResource("/FXML/Group.fxml"));
+        Scene           scene       = new Scene(loader.load());
+        GroupController controller  = loader.getController();
         controller.setAction("REMOVE_CLIENT");
         controller.setGroupName(selectedUser);
         controller.setUsername(userName.getText());
-        String[]        strSplit   = selectedUser.split(",");
+        String[] strSplit = selectedUser.split(",");
         for (String user : strSplit) {
             CheckBox checkBox = new CheckBox();
             checkBox.setText(user);
@@ -310,17 +368,18 @@ class ChatController implements Initializable {
         createGroup.setResizable(false);
     }
 
-    void GroupAddRemoveOn(){
+    void GroupAddRemoveOn() {
         add.setVisible(true);
         add.setDisable(false);
         remove.setVisible(true);
         remove.setDisable(false);
     }
 
-    void GroupAddRemoveOff(){
+    void GroupAddRemoveOff() {
         add.setVisible(false);
         add.setDisable(true);
         remove.setVisible(false);
         remove.setDisable(true);
     }
+
 }

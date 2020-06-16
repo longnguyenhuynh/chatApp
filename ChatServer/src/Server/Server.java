@@ -7,7 +7,6 @@ import java.net.*;
 
 public
 class Server {
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     static Vector<ClientHandler> clientHandlerVector = new Vector<>();
     static Vector<GroupHandler> groupHandlerVector = new Vector<>();
@@ -15,7 +14,8 @@ class Server {
     public static
     void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
         getGroup();
-        ServerSocket ss = new ServerSocket(Integer.parseInt(args[0]));
+//        ServerSocket ss = new ServerSocket(Integer.parseInt(args[0]));
+        ServerSocket ss = new ServerSocket(8080);
         Socket       s;
 
         while (true) {
@@ -35,12 +35,12 @@ class Server {
                     case "GROUP_ADD_CLIENT":
                         // receivedSplit[1]: group name, receivedSplit[2]: group name + new clients (separate by ,)
                         for (GroupHandler groupHandler : groupHandlerVector) {
-                            if(groupHandler.groupName.equals(receivedSplit[1])) {
+                            if (groupHandler.groupName.equals(receivedSplit[1])) {
                                 String   newClient      = receivedSplit[2].replace(receivedSplit[1] + ',', "");
                                 String[] newClientSplit = newClient.split(",");
                                 for (ClientHandler clientHandler : clientHandlerVector) {
                                     for (String client : newClientSplit) {
-                                        if(clientHandler.name.equals(client)) {
+                                        if (clientHandler.name.equals(client)) {
                                             clientHandler.AddGroup(receivedSplit[2]);
                                             break;
                                         }
@@ -59,16 +59,16 @@ class Server {
                         // receivedSplit[1]: group name, receivedSplit[2]: groupClient + removedGroupClient (separate by #)
                         String[] groupClientSplit = receivedSplit[2].split("#");
                         for (GroupHandler groupHandler : groupHandlerVector) {
-                            if(groupHandler.groupName.equals(receivedSplit[1])) {
+                            if (groupHandler.groupName.equals(receivedSplit[1])) {
                                 groupHandler.groupName = receivedSplit[1].replace(groupClientSplit[1], "");
                                 DBconnection.ChangeGroupName(groupHandler.groupName, receivedSplit[1]);
                                 String[] removedGroupClient = groupClientSplit[1].split(",");
                                 for (ClientHandler clientHandler : clientHandlerVector) {
                                     for (String removeClientName : removedGroupClient) {
-                                        if(clientHandler.name.equals(removeClientName)) {
+                                        if (clientHandler.name.equals(removeClientName)) {
                                             clientHandler.RemoveGroup(receivedSplit[1]);
                                             break;
-                                        } else if(clientHandler.name.equals(groupClientSplit[0])) {
+                                        } else if (clientHandler.name.equals(groupClientSplit[0])) {
                                             clientHandler.ChangeGroupName(groupHandler.groupName, receivedSplit[1]);
                                         }
                                     }
@@ -82,7 +82,7 @@ class Server {
                         String[] clientSplit = receivedSplit[2].split(",");
                         for (ClientHandler clientHandler : clientHandlerVector) {
                             for (String client : clientSplit) {
-                                if(clientHandler.name.equals(client)) {
+                                if (clientHandler.name.equals(client)) {
                                     groupHandler.clientHandlerVector.add(clientHandler);
                                     break;
                                 }
@@ -103,10 +103,16 @@ class Server {
                         Thread t = new Thread(client);
                         t.start();
                         break;
+                    case "FILE": // fromCLient + toClient
+                        FileHandler fileHandler = new FileHandler(s, dis, dos, receivedSplit[1], receivedSplit[2]);
+                        Thread thread = new Thread(fileHandler);
+                        thread.start();
+                        break;
                 }
             } catch(IOException e) {
                 s.close();
             }
+
         }
     }
 

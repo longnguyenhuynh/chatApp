@@ -11,6 +11,7 @@ public
 class Client extends Application {
     public static String ServerIP;
     public static int ServerPort;
+
     @Override
     public
     void start(Stage primaryStage) {
@@ -29,8 +30,11 @@ class Client extends Application {
 
     public static
     void main(String[] args) {
-        ServerIP = args[0];
-        ServerPort = Integer.parseInt(args[1]);
+//        ServerIP = args[0];
+//        ServerPort = Integer.parseInt(args[1]);
+// test
+        ServerIP = "localhost";
+        ServerPort = 8080;
         launch(args);
     }
 }

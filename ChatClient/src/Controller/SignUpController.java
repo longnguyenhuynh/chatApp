@@ -65,8 +65,8 @@ class SignUpController implements Initializable {
                 progress.setVisible(false);
             } else {
                 progress.setVisible(true);
-                InetAddress ip = InetAddress.getByName(Client.ServerIP);
-                Socket s = new Socket(ip, Client.ServerPort);
+                InetAddress      ip  = InetAddress.getByName(Client.ServerIP);
+                Socket           s   = new Socket(ip, Client.ServerPort);
                 DataInputStream  dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
@@ -80,7 +80,7 @@ class SignUpController implements Initializable {
                         alert.setVisible(true);
                         progress.setVisible(false);
                     }
-                } catch (IOException e) {
+                } catch(IOException e) {
                     s.close();
                 }
             }

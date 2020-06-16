@@ -23,6 +23,7 @@ class ClientHandler implements Runnable {
     @Override
     public
     void run() {
+        boolean isFile = false;
         String received;
         while (true) {
             try {
@@ -72,6 +73,7 @@ class ClientHandler implements Runnable {
                         }
                         break;
                     case "FILE": // fromCLient + toClient + fileName + fileLength
+                        isFile = true;
                         for (ClientHandler clientHandler : Server.clientHandlerVector) {
                             if (clientHandler.name.equals(tmpSplit[1])) {
                                 int    fileLength = Integer.parseInt(tmpSplit[3]);
@@ -90,10 +92,13 @@ class ClientHandler implements Runnable {
                 }
             } catch(IOException e) {
                 try {
-                    this.s.close();
-                    Server.clientHandlerVector.remove(this);
-                    RemoveClient(this.name);
-                    break;
+                    if (!isFile) {
+                        isFile = false;
+                        this.s.close();
+                        Server.clientHandlerVector.remove(this);
+                        RemoveClient(this.name);
+                        break;
+                    }
                 } catch(IOException ioException) {
                     ioException.printStackTrace();
                 }

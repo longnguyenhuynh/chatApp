@@ -121,7 +121,6 @@ class ChatController implements Initializable {
             while (true) {
                 try {
                     String msg = dis.readUTF();
-                    System.out.println(msg);
                     if (msg.contains("FILE_DATA#")) { // fileName + fileLength
                         String[] tmpSplit   = msg.split("#");
                         int      fileLength = Integer.parseInt(tmpSplit[2]);

@@ -109,7 +109,7 @@ class ClientHandler implements Runnable {
                                 if (clientHandler.name.equals(tmpSplit[1])) {
 //                                DBconnection.SaveFileData(tmpSplit[2], byteArray, tmpSplit[0], tmpSplit[1]);
 //                                DBconnection.SaveChatData(tmpSplit[0], tmpSplit[1], tmpSplit[0] + ": " + tmpSplit[2]);
-                                    clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[2]);
+                                    clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[1] + "#" + tmpSplit[2]);
                                     clientHandler.dos.writeUTF("FILE_DATA#" + tmpSplit[2] + "#" + fileLength);
                                     clientHandler.dos.write(byteArray, 0, fileLength);
                                     break;

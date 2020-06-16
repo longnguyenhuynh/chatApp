@@ -79,7 +79,7 @@ class ChatController implements Initializable {
             }
         });
         chatBox.setOnMouseClicked(event -> {
-            boolean  isFile = false;
+            boolean  isFile    = false;
             String   str       = chatBox.getSelectionModel().getSelectedItem();
             String[] fileSplit = new String[0];
             try {
@@ -306,7 +306,9 @@ class ChatController implements Initializable {
                         bis.read(byteArray, 0, byteArray.length);
                         dos.writeUTF("FILE#" + userName.getText() + "#" + selectedUser + "#" + file.getName() + "#" + byteArray.length);
                         dos.write(byteArray, 0, byteArray.length);
-                        chatBox.getItems().add(userName.getText() + ": " + file.getName());
+                        if (! selectedUser.contains(",")) {
+                            chatBox.getItems().add(userName.getText() + ": " + file.getName());
+                        }
                         fileHandler.put(file.getName(), byteArray);
                     }
                     assert fis != null;

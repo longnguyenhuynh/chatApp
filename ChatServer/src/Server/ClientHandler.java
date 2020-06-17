@@ -1,5 +1,7 @@
 package Server;
 
+import com.mysql.cj.jdbc.SuspendableXAConnection;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -96,7 +98,7 @@ class ClientHandler implements Runnable {
                                 for (ClientHandler clientHandler : groupHandler.clientHandlerVector) {
                                     for (String clientInGroup : clientInGroupSplit) {
                                         if (clientHandler.name.equals(clientInGroup)) {
-                                            clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[1] + "#" + tmpSplit[2]);
+                                            clientHandler.dos.writeUTF("FILE_GROUP#" + tmpSplit[0] + "#" + tmpSplit[1] + "#" + tmpSplit[2]);
                                             clientHandler.dos.writeUTF("FILE_DATA#" + tmpSplit[2] + "#" + fileLength);
                                             clientHandler.dos.write(byteArray, 0, fileLength);
                                             break;
@@ -109,7 +111,7 @@ class ClientHandler implements Runnable {
                                 if (clientHandler.name.equals(tmpSplit[1])) {
 //                                DBconnection.SaveFileData(tmpSplit[2], byteArray, tmpSplit[0], tmpSplit[1]);
 //                                DBconnection.SaveChatData(tmpSplit[0], tmpSplit[1], tmpSplit[0] + ": " + tmpSplit[2]);
-                                    clientHandler.dos.writeUTF("FILE#" + tmpSplit[0] + "#" + tmpSplit[1] + "#" + tmpSplit[2]);
+                                    clientHandler.dos.writeUTF("FILE_CHAT#" + tmpSplit[0] + "#" + tmpSplit[1] + "#" + tmpSplit[2]);
                                     clientHandler.dos.writeUTF("FILE_DATA#" + tmpSplit[2] + "#" + fileLength);
                                     clientHandler.dos.write(byteArray, 0, fileLength);
                                     break;
@@ -126,6 +128,7 @@ class ClientHandler implements Runnable {
                         RemoveClient(this.name);
                         break;
                     }
+                    else isFile = false;
                 } catch(IOException ioException) {
                     ioException.printStackTrace();
                 }

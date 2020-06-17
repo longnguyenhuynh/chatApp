@@ -188,10 +188,16 @@ class ChatController implements Initializable {
                                     if (selectedUser != null && selectedUser.equals(tmpSplit[0]))
                                         chatBox.getItems().add(tmpSplit[1]);
                                     break;
-                                case "FILE": // fromClient + toClient + fileName
+                                case "FILE_GROUP": // fromClient + toClient + fileName
                                     String[] strSplit = msgSplit[1].split("#");
                                     if (selectedUser != null && selectedUser.equals(strSplit[1])) {
                                         chatBox.getItems().add(strSplit[0] + ": " + strSplit[2]);
+                                    }
+                                    break;
+                                case "FILE_CHAT": // fromClient + toClient + fileName
+                                    String[] tmSplit = msgSplit[1].split("#");
+                                    if (selectedUser != null && selectedUser.equals(tmSplit[0])) {
+                                        chatBox.getItems().add(tmSplit[0] + ": " + tmSplit[2]);
                                     }
                                     break;
                                 default:
@@ -309,6 +315,7 @@ class ChatController implements Initializable {
                         if (! selectedUser.contains(",")) {
                             chatBox.getItems().add(userName.getText() + ": " + file.getName());
                         }
+                        dos.flush();
                         fileHandler.put(file.getName(), byteArray);
                     }
                     assert fis != null;
